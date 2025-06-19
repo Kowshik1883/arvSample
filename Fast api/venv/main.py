@@ -9,6 +9,7 @@ from PyPDF2 import PdfReader
 import mimetypes
 from pydantic import BaseModel
 from Database.mongo import db
+from Services.domainService import DomainService
 
 app = FastAPI()
 
@@ -198,3 +199,11 @@ async def insert_users():
 
     result = await users_db.insert_many(users)
     return {"inserted_ids": [str(_id) for _id in result.inserted_ids]}
+
+@app.get("/domains/")
+async def get_all_domains():
+    try:
+        domains = await DomainService.get_all_domains()
+        return {"domains": domains}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))    
