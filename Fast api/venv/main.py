@@ -10,6 +10,7 @@ import mimetypes
 from pydantic import BaseModel
 from Database.mongo import db
 from Services.domainService import DomainService
+from Models.GenericResponse import GenericResponse
 
 app = FastAPI()
 
@@ -204,6 +205,7 @@ async def insert_users():
 async def get_all_domains():
     try:
         domains = await DomainService.get_all_domains()
-        return {"domains": domains}
+        response = GenericResponse(status="success", message="Domains fetched successfully", data={"domains": domains})
+        return response.to_dict()
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))    
+        raise HTTPException(status_code=500, detail=str(e))

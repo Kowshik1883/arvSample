@@ -6,11 +6,7 @@ class DomainService:
         domains = []
         async for doc in domain_db.find():
             domains.append({
-                'id': str(doc.get('_id')),
                 'DomainId': doc.get('DomainId'),
-                'Name': doc.get('Name'),
-                'Status': doc.get('Status'),
-                'CreatedBy': doc.get('CreatedBy'),
-                'CreatedAt': doc.get('CreatedAt')
+                'Name': doc.get('Name')
             })
         return domains
