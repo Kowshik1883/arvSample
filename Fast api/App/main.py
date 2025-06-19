@@ -12,16 +12,12 @@ from Database.mongo import db
 from Services.domainService import DomainService
 from Services.projectService import ProjectService
 from Services.ruleService import RuleService
+from Services.userService import UserService
 from Models.GenericResponse import GenericResponse
 
 app = FastAPI()
 
 users_db = db["user"]
-
-# Pydantic model for login request
-class LoginRequest(BaseModel):
-    username: str
-    password: str
 
 
 def read_file(file: UploadFile, excel_only: bool = False):
@@ -150,25 +146,10 @@ async def upload_file(
 
 
 
-
 @app.post("/login/")
-async def login(login_request: LoginRequest):
-    user = await users_db.find_one({"username": login_request.username})
-
-    if not user or user["password"] != login_request.password:
-        response = GenericResponse(
-            status="fail",
-            message="Invalid username or password",
-            data={}
-        )
-        return response.to_dict()
-
-    response = GenericResponse(
-        status="success",
-        message="Login successful",
-        data={"username": login_request.username,"password": login_request.password}
-    )
-    return response.to_dict()
+async def login(login_request: dict):
+    result = await LoginService.login_user(login_request)
+    return result
 
 
 @app.get("/domains/")
