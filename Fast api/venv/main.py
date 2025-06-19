@@ -234,3 +234,16 @@ async def add_project(project: ProjectCreate):
         return response.to_dict()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/projects/getAllProjects")
+async def get_all_projects():
+    try:
+        projects = await ProjectService.get_all_projects()
+        response = GenericResponse(
+            status="success",
+            message="Projects fetched successfully",
+            data=projects
+        )
+        return response.to_dict()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
