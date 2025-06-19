@@ -1,15 +1,18 @@
 from Database.mongo import db
 from datetime import datetime
+import uuid
 
 project_db = db["projects"]
+
+def get_unique_id():
+    return str(uuid.uuid4())
 
 class ProjectService:
     @staticmethod
     async def add_project(data: dict):
         project = {
-            "ProjectId": data.get("ProjectId"),
+            "ProjectId": get_unique_id(),
             "Name": data.get("Name"),
-            "DomainId": data.get("DomainId"),
             "Description": data.get("Description"),
             "Status": "Active",
             "Owner": data.get("Owner"),
