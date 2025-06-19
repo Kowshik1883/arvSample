@@ -147,8 +147,8 @@ async def upload_file(
 
 
 @app.post("/login/")
-async def login(login_request: dict):
-    result = await LoginService.login_user(login_request)
+async def login(username: str = Form(...),password: str = Form(...)):
+    result = await UserService.login_user(username,password)
     return result
 
 
@@ -163,9 +163,19 @@ async def get_all_domains():
 
 
 @app.post("/projects/")
-async def add_project(project: dict):
+async def add_project(
+    Name: str = Form(...),
+    Description: str = Form(...),
+    Owner: str = Form(...),
+    CreatedBy: str = Form(...)
+):
     try:
-        result = await ProjectService.add_project(project.dict())
+        result = await ProjectService.add_project(
+            Name=Name,
+            Description=Description,
+            Owner=Owner,
+            CreatedBy=CreatedBy
+        )
         response = GenericResponse(
             status="success",
             message="Project added successfully",

@@ -1,6 +1,7 @@
 from Database.mongo import db
 from datetime import datetime
 import uuid
+from fastapi import Form
 
 project_db = db["projects"]
 
@@ -9,14 +10,19 @@ def get_unique_id():
 
 class ProjectService:
     @staticmethod
-    async def add_project(data: dict):
+    async def add_project(
+        Name: str = Form(...),
+        Description: str = Form(...),
+        Owner: str = Form(...),
+        CreatedBy: str = Form(...)
+    ):
         project = {
             "ProjectId": get_unique_id(),
-            "Name": data.get("Name"),
-            "Description": data.get("Description"),
+            "Name": Name,
+            "Description": Description,
             "Status": "Active",
-            "Owner": data.get("Owner"),
-            "CreatedBy": data.get("CreatedBy"),
+            "Owner": Owner,
+            "CreatedBy": CreatedBy,
             "CreatedAt": datetime.utcnow()
         }
 

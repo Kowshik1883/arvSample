@@ -1,13 +1,11 @@
+from fastapi import Form
 from Database.mongo import db
 
 users_db = db["user"]
 
 class UserService:
     @staticmethod
-    async def login_user(login_data: dict) -> dict:
-        username = login_data.get("username")
-        password = login_data.get("password")
-
+    async def login_user(username: str = Form(...),password: str = Form(...)) -> dict:
         if not username or not password:
             return {
                 "status": "fail",
