@@ -1,6 +1,6 @@
 import math
 from typing import Optional
-from fastapi import FastAPI, File, HTTPException, UploadFile, Form
+from fastapi import FastAPI, File, HTTPException, UploadFile, Form, Query
 from fastapi.responses import JSONResponse
 import pandas as pd
 from io import BytesIO
@@ -10,8 +10,8 @@ import mimetypes
 from pydantic import BaseModel
 from Database.mongo import db
 from Services.domainService import DomainService
-from Models.project_model import ProjectCreate
 from Services.projectService import ProjectService
+from Services.ruleService import RuleService
 from Models.GenericResponse import GenericResponse
 
 app = FastAPI()
@@ -182,7 +182,7 @@ async def get_all_domains():
 
 
 @app.post("/projects/")
-async def add_project(project: ProjectCreate):
+async def add_project(project: dict):
     try:
         result = await ProjectService.add_project(project.dict())
         response = GenericResponse(
@@ -204,5 +204,29 @@ async def get_all_projects():
             data=projects
         )
         return response.to_dict()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/rules/getRulesByProject")
+async def get_rules_by_project(
+    projectId: str = Query(...),
+    page: int = Query(...),
+    search: str = Query("", alias="search")
+):
+    try:
+        result = await RuleService.get_rules_by_project({
+            "projectId": projectId,
+            "search": search,
+            "page": page
+        })
+
+        response = GenericResponse(
+            status="success",
+            message=result["message"],
+            data=result["data"]
+        )
+        return response.to_dict()
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
