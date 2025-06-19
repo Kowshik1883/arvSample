@@ -184,10 +184,19 @@ async def login(login_request: LoginRequest):
     user = await users_db.find_one({"username": login_request.username})
 
     if not user or user["password"] != login_request.password:
-        return {"message": "Invalid username or password"}
-        
+        response = GenericResponse(
+            status="fail",
+            message="Invalid username or password",
+            data={}
+        )
+        return response.to_dict()
 
-    return {"message": f"Login successful for user: {login_request.username}"}
+    response = GenericResponse(
+        status="success",
+        message="Login successful",
+        data={"username": login_request.username,"password": login_request.password}
+    )
+    return response.to_dict()
 
 
 @app.post("/insert-users/")
