@@ -149,34 +149,6 @@ async def upload_file(
         )
 
 
-#     try:
-#         username = login_request.username
-#         password = login_request.password
-
-#         # Check if user exists and password matches
-#         user = users_db.get(username)
-#         if not user:
-#             raise HTTPException(
-#                 status_code=status.HTTP_401_UNAUTHORIZED,
-#                 detail="Invalid username or password"
-#             )
-        
-#         if user["password"] != password:
-#             raise HTTPException(
-#                 status_code=status.HTTP_401_UNAUTHORIZED,
-#                 detail="Invalid username or password"
-#             )
-
-#         return {"message": f"Login successful for user: {username}"}
-
-#     except HTTPException as e:
-#         raise e
-#     except Exception as e:
-#         raise HTTPException(
-#             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-#             detail=f"Error processing login: {str(e)}"
-#         )
-
 
 
 @app.post("/login/")
@@ -198,19 +170,6 @@ async def login(login_request: LoginRequest):
     )
     return response.to_dict()
 
-
-@app.post("/insert-users/")
-async def insert_users():
-    users = [
-        {"username": "johndoe", "password": "securepassword123"},
-        {"username": "admin", "password": "admin123"},
-        {"username": "bob_smith", "password": "bobsecure789"},
-        {"username": "charlie_dev", "password": "charliecode321"},
-        {"username": "diana_w", "password": "dianapass654"}
-    ]
-
-    result = await users_db.insert_many(users)
-    return {"inserted_ids": [str(_id) for _id in result.inserted_ids]}
 
 @app.get("/domains/")
 async def get_all_domains():
