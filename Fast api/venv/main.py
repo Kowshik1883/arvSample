@@ -10,6 +10,8 @@ import mimetypes
 from pydantic import BaseModel
 from Database.mongo import db
 from Services.domainService import DomainService
+from Models.project_model import ProjectCreate
+from Services.projectService import ProjectService
 from Models.GenericResponse import GenericResponse
 
 app = FastAPI()
@@ -206,6 +208,20 @@ async def get_all_domains():
     try:
         domains = await DomainService.get_all_domains()
         response = GenericResponse(status="success", message="Domains fetched successfully", data={"domains": domains})
+        return response.to_dict()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/projects/")
+async def add_project(project: ProjectCreate):
+    try:
+        result = await ProjectService.add_project(project.dict())
+        response = GenericResponse(
+            status="success",
+            message="Project added successfully",
+            data={"project_id": result["project_id"]}
+        )
         return response.to_dict()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
