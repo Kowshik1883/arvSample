@@ -8,7 +8,7 @@ import docx
 from PyPDF2 import PdfReader
 import mimetypes
 from pydantic import BaseModel
-from Database.mongo import db
+from Database.mongo import db, login_user, get_all_domains, add_project, get_all_projects, get_rules_by_project
 from Services.domainService import DomainService
 from Services.projectService import ProjectService
 from Services.ruleService import RuleService
@@ -145,37 +145,36 @@ async def upload_file(
         )
 
 
-
 @app.post("/login/")
-async def login(username: str = Form(...),password: str = Form(...)):
-    result = await UserService.login_user(username,password)
-    return result
-
+async def login(username: str = Form(...), password: str = Form(...)):
+    try:
+        result = await login_user(username, password)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/domains/")
-async def get_all_domains():
+async def get_all_domains_endpoint():
     try:
-        domains = await DomainService.get_all_domains()
-        response = GenericResponse(status="success", message="Domains fetched successfully", data={"domains": domains})
+        domains = await get_all_domains()
+        response = GenericResponse(
+            status="success",
+            message="Domains fetched successfully",
+            data={"domains": domains}
+        )
         return response.to_dict()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @app.post("/projects/")
-async def add_project(
+async def add_project_endpoint(
     Name: str = Form(...),
     Description: str = Form(...),
     Owner: str = Form(...),
     CreatedBy: str = Form(...)
 ):
     try:
-        result = await ProjectService.add_project(
-            Name=Name,
-            Description=Description,
-            Owner=Owner,
-            CreatedBy=CreatedBy
-        )
+        result = await add_project(Name, Description, Owner, CreatedBy)
         response = GenericResponse(
             status="success",
             message="Project added successfully",
@@ -186,9 +185,9 @@ async def add_project(
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/projects/getAllProjects")
-async def get_all_projects():
+async def get_all_projects_endpoint():
     try:
-        projects = await ProjectService.get_all_projects()
+        projects = await get_all_projects()
         response = GenericResponse(
             status="success",
             message="Projects fetched successfully",
@@ -198,26 +197,19 @@ async def get_all_projects():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @app.get("/api/rules/getRulesByProject")
-async def get_rules_by_project(
+async def get_rules_by_project_endpoint(
     projectId: str = Query(...),
     page: int = Query(...),
     search: str = Query("", alias="search")
 ):
     try:
-        result = await RuleService.get_rules_by_project({
-            "projectId": projectId,
-            "search": search,
-            "page": page
-        })
-
+        result = await get_rules_by_project(projectId, page, search)
         response = GenericResponse(
             status="success",
             message=result["message"],
             data=result["data"]
         )
         return response.to_dict()
-
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
